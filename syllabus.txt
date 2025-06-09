@@ -88,3 +88,36 @@ Your case is in the textbook on Chapter	Select approved topic here	Your essay to
 
 db2025
 [Paste additional instructor-specific notes or rubric tweaks here if needed, e.g. exceptions, assignment variations, particular emphasis, or reminders for feedback tone.]
+
+This is relevant context for the submissions
+
+As I have detailed in the course outline, LLM-generated content often avoids making clear political claims. That’s a core problem for IR arguments. IR theories are axiomatic — that means each one starts from a set of core assumptions that it treats as true. These aren’t just perspectives you can blend together; they’re mutually exclusive ways of understanding the world. If you think the world is inherently based in war, your responses, your view of institutions, and your readiness will be framed through that framework. Similarly, if you believe that the world is constructed through language, your responses will reflect that. Therefore, in your writing, you need to pick a position based on one of those frameworks and defend it. You’re not being asked to describe the theories — you’re being asked to use them to make an argument. I do not need summaries.
+
+Another issue: LLM-generated work often just walks through the texts in sequence — text one, text two, text three — without synthesis or voice. It breaks everything into little fragments. That’s not the paragraph structure required in this course. You need integrated paragraphs that synthesize and reflect, not segmented summaries. I need to hear your voice and why you think it matters.
+
+The essay for this course is a demonstration of your breadth of understanding of the readings - that's why there's no outside sources allowed. This is a second year essay, I need to see that you are clearly answering the question, that you are using the right 'hat', and that the evidence supports your argument.
+
+IR causes real problems for ChatGPT and other chatbots because they want to describe rather than explain. The 'hats' is a way to deal with how IR is 'axiomatic' which creates real problems for chatbots that want to avoid blaming anyone for anything (so they don't get sued). This means chatbots are pretty terrible with the way in which IR questions every concept and idea, and therefore are unable to make good arguments. That is why the essay exercise has clear questions and hats, they are designed to trip up generated content that wants to describe, not argue. I am providing weekly feedback to indicate the type of problems that you will encounter in your essays (and it just helps with writing).
+
+For the essay you cannot cite the PowerPoint slides or the YouTube videos - you have to refer to the relevant course and additional texts.
+Your essays require a clear thesis that answers the assigned question.
+Your essays require a coherent argument. What I'm seeing with the response papers and people using ChatGPT is a listing of description one, two, three points not connected in any way and not linked to a coherent argument. You need coherent paragraphs.
+I have access to everything you're using in the essay, I will be checking the pages to make sure that there is data (clear evidence with nouns) on your cited pages that is accurately represented in your quotations. If I have questions about excessive paraphrasing I may request to zoom meeting to discuss it.
+The human rights paper has an additional source Jones, Adam. Genocide: A comprehensive introduction. Routledge, 2016. Chapter 6. The link is available on the Google sheet here.
+Quotations in the essay need to provide relevant facts, you need to develop your arguments. Citing arguments from the sources isn't the same as making an argument.
+The use of appropriate approaches ('hats') they are all here with relevant reading.
+You can use more than one approach but there must be a dominant approach that explains your argument and answers the question.
+ChatGPT loves to describe the approaches but can't apply the approaches unless you do really good prompting.&nbsp;
+
+Guidance for students
+
+I don't know what a 'marginalized voice' is that's a tautology - if you're trying to explain the marginalization of voices by saying voices are marginalized it doesn't make any sense. We can identify who is the dominant voices, how that reflects forms of misogyny, white supremacy, Western dominance and settler colonial mindsets as explanatory reasons for why that is happening. Remember that we need to identify the reasons ('causes') for these problems not just summarize that they exist.
+
+The general problem students are having is thinking politically, politics is a combination of a set of assumptions that we make about the world, and then we act in a world that pushes back against those assumptions, that doesn't mean those assumptions aren't valid it just means they're not being reflected in the world that we are analysing. So there's a cycle of analysis --> event --> analysis that has to recognise there are different ways to approach different problems, and we need to do our best to argue that this is the way the world should be perceived, and that if it's not perceived that way this is the reason that it can't be. So we can argue that we need a feminist future that challenges systems of patriarchy, while still arguing that patriarchy is an ongoing form of oppression of women's voices. Our starting framework is going to be a set of assumptions (hats) that encounter evidence, we can find evidence to support those claims but we also need to criticise the evidence that perpetuates the problem.
+
+Watch what happens if I feed that description into chatgpt:
+
+'This means that students are struggling to engage with politics as a dynamic, interpretive process. Political thinking begins with a normative framework (assumptions or "hats") that we bring to the world. When the world resists or contradicts those assumptions, it doesn't necessarily invalidate them—it reveals the tensions between theory and lived reality. The process is cyclical: theory leads to analysis, which is tested by events, leading to revised or reaffirmed analysis. Effective political thinking requires defending a vision (e.g., feminism), confronting contrary evidence, and interrogating dominant narratives that obscure or sustain oppression.'
+
+Do you see how it took the specificity of patriarchy and oppression and turned it into 'dominant narratives' - that's precisely what we're trying to avoid.
+
