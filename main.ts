@@ -1,10 +1,14 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+const AZURE_API_KEY = Deno.env.get("AZURE_OPENAI_KEY");
 const QUALTRICS_API_TOKEN = Deno.env.get("QUALTRICS_API_TOKEN");
 const QUALTRICS_SURVEY_ID = Deno.env.get("QUALTRICS_SURVEY_ID");
 const QUALTRICS_DATACENTER = Deno.env.get("QUALTRICS_DATACENTER");
 const SYLLABUS_LINK = Deno.env.get("SYLLABUS_LINK") || "";
+
+const AZURE_DEPLOYMENT_NAME = "gpt-4.1-mini";
+const AZURE_ENDPOINT = "https://chatbot-api-western.openai.azure.com";
+const AZURE_API_VERSION = "2024-04-01-preview";
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -22,51 +26,55 @@ serve(async (req: Request): Promise<Response> => {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  let body;
+  let body: { query: string };
   try {
     body = await req.json();
-  } catch (_) {
+  } catch {
     return new Response("Invalid JSON", { status: 400 });
   }
 
-  const raw = body.query.trim();
-  let guidance = "";
-  let paragraph = raw;
-
-  if (raw.startsWith("dsb2025 -")) {
-    const split = raw.split("\n");
-    guidance = split[0].replace("dsb2025 -", "").trim();
-    paragraph = split.slice(1).join("\n").trim();
+  if (!AZURE_API_KEY) {
+    return new Response("Missing Azure API key", { status: 500 });
   }
 
-  const syllabus = await Deno.readTextFile("syllabus.txt").catch(() => "Error loading syllabus.");
+  const syllabus = await Deno.readTextFile("syllabus.txt").catch(() =>
+    "Error loading syllabus."
+  );
 
   const messages = [
     {
       role: "system",
       content:
-        `You are an academic grading assistant. Use the criteria in syllabus.txt as a rubric. Provide detailed feedback and then clearly assign a grade (A, B, C, or D) based on the paragraph. Always include the final grade. End with: 'This is a sample grading exercise. No grades will ever be determined by a bot.'\n\n${guidance ? `Instructor note: ${guidance}\n\n` : ""}Grading criteria from syllabus.txt:\n${syllabus}`,
+        "You are an accurate assistant. Always include a source URL if possible.",
+    },
+    {
+      role: "system",
+      content: `Here is important context from syllabus.txt:\n${syllabus}`,
     },
     {
       role: "user",
-      content: paragraph,
+      content: body.query,
     },
   ];
 
-  const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-4o",
-      messages,
-    }),
-  });
+  const azureResponse = await fetch(
+    `${AZURE_ENDPOINT}/openai/deployments/${AZURE_DEPLOYMENT_NAME}/chat/completions?api-version=${AZURE_API_VERSION}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": AZURE_API_KEY,
+      },
+      body: JSON.stringify({
+        messages,
+      }),
+    }
+  );
 
-  const openaiJson = await openaiResponse.json();
-  const result = openaiJson?.choices?.[0]?.message?.content || "No response from OpenAI";
+  const azureJson = await azureResponse.json();
+  const baseResponse =
+    azureJson?.choices?.[0]?.message?.content || "No response from Azure OpenAI";
+  const result = `${baseResponse}\n\nThere may be errors in my responses; always refer to the course web page: ${SYLLABUS_LINK}`;
 
   let qualtricsStatus = "Qualtrics not called";
 
@@ -78,14 +86,17 @@ serve(async (req: Request): Promise<Response> => {
       },
     };
 
-    const qt = await fetch(`https://${QUALTRICS_DATACENTER}.qualtrics.com/API/v3/surveys/${QUALTRICS_SURVEY_ID}/responses`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-TOKEN": QUALTRICS_API_TOKEN,
-      },
-      body: JSON.stringify(qualtricsPayload),
-    });
+    const qt = await fetch(
+      `https://${QUALTRICS_DATACENTER}.qualtrics.com/API/v3/surveys/${QUALTRICS_SURVEY_ID}/responses`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-TOKEN": QUALTRICS_API_TOKEN,
+        },
+        body: JSON.stringify(qualtricsPayload),
+      }
+    );
 
     qualtricsStatus = `Qualtrics status: ${qt.status}`;
   }
