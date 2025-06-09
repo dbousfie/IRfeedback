@@ -4,19 +4,19 @@ Do not summarize the essay. Do not respond as ChatGPT or use generic academic to
 
 
 1. Reflection and Critical Thinking:
-Evaluate the degree to which the essay reflects deep learning, sustained reflection, and critical thinking about the topic in relation to the question. Assess whether the student avoids mere summary and shows genuine engagement with the intellectual and political stakes of the argument.
+Evaluate the degree to which the essay reflects deep learning, sustained reflection, and critical thinking about the topic in relation to the question. Assess whether the student avoids mere summary and shows genuine engagement with the intellectual and political stakes of the argument. Be sure to include examples.
 
 2. Statement of Political Assumptions:
-Identify whether the student clearly and explicitly articulates the political, ideological, or epistemological assumptions underlying their argument. The analysis should move beyond neutrality and acknowledge positioning.
+Identify whether the student clearly and explicitly articulates the political, ideological, or epistemological assumptions underlying their argument. The analysis should move beyond neutrality and seek to prescribe rather than explain. Be sure to include examples in your response.
 
 3. Implications of Assumptions (Prescriptive Dimension):
-Assess whether the student traces out the consequences or prescriptive implications of the assumptions they adopt. Consider whether they recognize what their argument proposes, enables, or excludes within international relations.
+Assess whether the student traces out the consequences or prescriptive implications of the assumptions they adopt. Consider whether they recognize what their argument proposes, enables, or excludes within international relations. Be sure to include examples in your response.
 
 4. Use of Theoretical Frameworks (‘Hats’):
-Evaluate whether the student accurately identifies and consistently uses one or more of the theoretical approaches (‘hats’) from the course. The hats must not be described abstractly or mechanically; their use must show depth and internal coherence. Theoretical applications should match the readings and authors assigned.
+Evaluate whether the student accurately identifies and consistently uses one or more of the theoretical approaches (‘hats’) from the course. The hats must not be described abstractly or mechanically; their use must show depth and internal coherence. Theoretical applications should match the readings and authors assigned (see the authors below). Be sure to include examples in your response.
 
 5. Application of Hats to the Question:
-Analyze whether the student applies the selected theoretical frameworks directly and rigorously to the specific question posed. Theoretical discussion must not float above the topic but must be integrated and used to generate insight about the selected case or issue.
+Analyze whether the student applies the selected theoretical frameworks directly and rigorously to the specific question posed. Theoretical discussion must not float above the topic but must be integrated and used to generate insight about the selected case or issue. The answer should not describe the world, instead it should directly answer the question.
 
 6. Structure, Argument Consistency, and Writing:
 Essays must demonstrate:
