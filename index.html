@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self Grade your Weekly Paragraphs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Lato', sans-serif;
+      font-size: 17px;
+      color: #202122;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2, h3 {
+      font-weight: 700;
+      color: #202122;
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    textarea, button {
+      font-size: 17px;
+      font-family: 'Lato', sans-serif;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+    }
+
+    button {
+      background-color: #006fbf;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 17px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #005a9e;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    #response {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 4px;
+      min-height: 100px;
+      background-color: #f9f9f9;
+      white-space: pre-wrap;
+    }
+
+    .spinner {
+      display: none;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #202122;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      display: none;
+      font-size: 15px;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Self Grade your weekly paragraph submissions here</h2>
+  <h1>Essay Grading Criteria</h1>
+
+  <h2>A Grade Criteria</h2>
+  <p>1. Topic sentence explicitly states a political stance or argument that goes beyond mere description.</p>
+  <p>2. Paragraph has three clearly defined arguments, each tied to a distinct academic source (with page numbers) and followed by the student’s own critical reflection explaining why the point matters.</p>
+  <p>3. Writing shows clear political voice—meaning it does not equivocate, but positions itself concretely.</p>
+  <p>4. Logical progression ties each argument to the overarching thesis.</p>
+  <p>5. Concluding sentence restates the political stance and signals how it leads to the next paragraph.</p>
+  <p>6. Includes minimal phrasing or concepts from the weasel word list below.</p>
+  <p>7. All items must be present to award A.</p>
+
+  <h2>B Grade Criteria</h2>
+  <p>8. Topic sentence identifies a general political perspective but is less forceful (some equivocation or broadness).</p>
+  <p>9. Lists major arguments but may be missing either the “why it matters” piece or a fully distinct stance.</p>
+  <p>10. Three sources are cited, but at least one citation lacks a page number.</p>
+  <p>11. Concluding sentence is broad or vaguely restates the topic without a strong "so what?".</p>
+  <p>12. Language is mostly formal but occasionally lapses into description or summary.</p>
+  <p>13. Includes some phrasing or concepts from the weasel word list below.</p>
+  <p>14. Assign B if at least one A-level requirement is missing but the paragraph remains on-topic and academically focused.</p>
+
+  <h2>C Grade Criteria</h2>
+  <p>15. Paragraph is generally relevant, but the political stance is unclear, weak, or lost in description.</p>
+  <p>16. Arguments lack sufficient evidence or reflection on why those arguments matter; citations are incomplete (e.g., missing page numbers for multiple sources or unclear attribution).</p>
+  <p>17. Sentences are disconnected from a unifying political thesis or remain purely descriptive.</p>
+  <p>18. No clear signposts or concluding statement that reiterates a stance.</p>
+  <p>19. Includes many of the phrases or concepts from the weasel word list below.</p>
+  <p>20. Assign C if the paragraph is missing multiple B-level elements or fails to make a definite claim.</p>
+
+  <h2>D Grade Criteria</h2>
+  <p>21. No discernible political stance or significance—fully neutral or purely descriptive.</p>
+  <p>22. No coherent structure or progression: it jumps between unrelated points.</p>
+  <p>23. No academic citations or citations are extremely vague (e.g., references to “a lecture,” “a textbook,” or missing author names).</p>
+  <p>24. Language is informal, relies on clichés, or provides no sense of why the topic matters.</p>
+  <p>25. Contains many of the phrases or concepts from the weasel word list below to the extent that it reduces clarity.</p>
+  <p>26. Assign D if the paragraph fails to demonstrate any of the A/B/C requirements.</p>
+
+<p> current weasel word list: Aligns with, Challenging dominant, Complexities, complex challenge, Contributes to, Critically interact, Cultural artifact, Demonstrates analogous role, Dominant structures, Drawing parallels, Echoes, Effects of marginalization, Explores themes, Hierarchical structures, In search of consensus, Institutional inequalities, Institutional oppression, Lack of diversity, Marginalized communities, Mirrors, Oppressed societies, Oppressive frameworks, Plays a role in, Parallels, Problematic, Risks exacerbating issues, Socioeconomic disparities, Structural barriers, Structural determinants, Structural determinants, Structural exclusion, Structural exploitation, Structural inequalities, Structural inequity, Structural racism, Structural violence, Systemic gaps, Systemic injustice, Systemic marginalization, Systemic oppression, Tended to be, Transformative achievement, Varying perspectives, Various groups, Valuable cultural artifact, Which suggests, Widen systemic gaps
+</p>
+  
+  <form id="queryForm">
+    <label for="query">Enter your weekly 250 word paragraph here:</label>
+    <textarea id="query" name="query" required rows="4"></textarea>
+    <button type="submit">Submit</button>
+    <div class="spinner" id="spinner"></div>
+  </form>
+
+  <h3>ChatGPT Response:</h3>
+  <div id="response"></div>
+  <div class="loading-text" id="loadingText">Querying ChatGPT, please wait...</div>
+
+  <script>
+    document.getElementById('queryForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const responseDiv = document.getElementById('response');
+      const spinner = document.getElementById('spinner');
+      const loadingText = document.getElementById('loadingText');
+      const query = document.getElementById('query').value;
+
+      responseDiv.innerText = '';
+      spinner.style.display = 'inline-block';
+      loadingText.style.display = 'block';
+
+      try {
+        const res = await fetch("https://paragraph-marker.deno.dev/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query })
+        });
+        const text = await res.text();
+        responseDiv.innerText = text;
+      } catch (err) {
+        responseDiv.innerText = "Error: " + err.message;
+      } finally {
+        spinner.style.display = 'none';
+        loadingText.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
