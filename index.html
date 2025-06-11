@@ -26,35 +26,57 @@
 </head>
 <body>
   <h2> feedback mechanism</h2>
-  <form id="queryForm">
-    <textarea name="query" id="query" rows="5" cols="60" placeholder="Type your question here..."></textarea><br />
-    <button type="submit">Submit</button>
-  </form>
+<form id="queryForm">
+  <label for="instructor">Instructor Comments:</label><br />
+  <textarea name="instructor" id="instructor" rows="4" cols="60" placeholder="Enter your comments here..."></textarea><br /><br />
+
+  <label for="essay">Student Essay:</label><br />
+  <textarea name="essay" id="essay" rows="10" cols="60" placeholder="Paste the student essay here..."></textarea><br /><br />
+
+  <button type="submit">Submit</button>
+</form>
+
   <h3>Response:</h3>
   <pre id="response"></pre>
 
-  <script>
-    const form = document.getElementById("queryForm");
-    const responseBox = document.getElementById("response");
+<script>
+  const form = document.getElementById("queryForm");
+  const responseBox = document.getElementById("response");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      responseBox.textContent = "Loading...";
-      const query = document.getElementById("query").value;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    responseBox.textContent = "Loading...";
 
-      try {
-        const res = await fetch("https://irfeedback0609.deno.dev/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query }),
-        });
+    const instructor = document.getElementById("instructor").value;
+    const essay = document.getElementById("essay").value;
 
-        const text = await res.text();
-        responseBox.textContent = text;
-      } catch (err) {
-        responseBox.textContent = "Error contacting server.";
-      }
-    });
-  </script>
+    const combinedQuery = `
+db2025
+The instructor’s in-text comments are authoritative and must guide all feedback. Do not override, soften, or generalize them.
+
+# Instructor Comments:
+${instructor}
+
+# Student Essay:
+${essay}
+
+Please provide structured feedback under the six db2025 categories. Feedback must be concise, evaluative, and written in the instructor’s voice.
+    `.trim();
+
+    try {
+      const res = await fetch("https://irfeedback0609.deno.dev/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: combinedQuery }),
+      });
+
+      const text = await res.text();
+      responseBox.textContent = text;
+    } catch (err) {
+      responseBox.textContent = "Error contacting server.";
+    }
+  });
+</script>
+
 </body>
 </html>
