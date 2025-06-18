@@ -65,6 +65,17 @@ Settings → Pages → Source = `main` branch → root
 
 Use `brightspace.html` with an iframe pointing to your hosted frontend.
 
+### 7. Qualtrics Logging Setup (Optional)
+If using Qualtrics, make sure your survey contains embedded data fields:
+
+```
+responseText
+queryText
+```
+
+These will be populated by the bot. Responses will include a hidden HTML comment like:
+`<!-- Qualtrics status: 200 -->`
+
 ## Notes
 
 * Input is transmitted securely over HTTPS
