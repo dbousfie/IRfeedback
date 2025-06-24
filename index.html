@@ -15,7 +15,7 @@
       align-items: flex-start;
       margin-bottom: 2rem;
     }
-    .sample-box, .input-box {
+    .input-box, .sample-box {
       flex: 1;
       max-width: 600px;
     }
@@ -45,28 +45,28 @@
 
 <form id="queryForm">
   <div class="input-group">
-    <div class="sample-box">
-      <label>Sample Feedback:</label>
-      <div class="sample-content">
-        Excellent writing, strong clear engagement with the course readings. Very well argued paper with lots of examples and a close reading of the text synthesized with textbook. Excellent work
-      </div>
-    </div>
     <div class="input-box">
       <label for="instructor">Reviewer Essay Comments:</label><br />
       <textarea name="instructor" id="instructor" rows="4" cols="60" placeholder="Enter your comments here..."></textarea>
     </div>
+    <div class="sample-box">
+      <label>Sample Feedback:</label>
+      <div class="sample-content">
+       Excellent writing, strong clear engagement with the course readings. Very well argued paper with lots of examples and a close reading of the text synthesized with textbook. Excellent work
+      </div>
+    </div>
   </div>
 
   <div class="input-group">
+    <div class="input-box">
+      <label for="essay">Essay for submission:</label><br />
+      <textarea name="essay" id="essay" rows="10" cols="60" placeholder="Paste the student essay here..."></textarea>
+    </div>
     <div class="sample-box">
       <label>Sample Essay:</label>
       <div class="sample-content">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis lorem non urna congue.
       </div>
-    </div>
-    <div class="input-box">
-      <label for="essay">Essay for submission:</label><br />
-      <textarea name="essay" id="essay" rows="10" cols="60" placeholder="Paste the student essay here..."></textarea>
     </div>
   </div>
 
