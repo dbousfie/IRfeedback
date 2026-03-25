@@ -1,141 +1,513 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Evaluation summary</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paragraph Writing Patterns Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Lato', sans-serif;
-      margin: 2rem;
+      font-size: 15px;
+      color: #202122;
+      margin: 0;
+      padding: 10px;
+      background: #fff;
     }
-    .input-group {
-      display: flex;
-      gap: 2rem;
-      align-items: flex-start;
-      margin-bottom: 2rem;
+
+    .container {
+      max-width: 820px;
+      margin: auto;
     }
-    .input-box, .sample-box {
-      flex: 1;
-      max-width: 600px;
+
+    h2 {
+      font-weight: 700;
+      color: #202122;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      font-size: 18px;
     }
+
+    .intro-text {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    textarea, button {
+      font-size: 14px;
+      font-family: 'Lato', sans-serif;
+    }
+
     textarea {
-      font-family: monospace;
       width: 100%;
-    }
-    .sample-content {
-      background: #f9f9f9;
+      padding: 10px;
       border: 1px solid #ccc;
-      padding: 0.5rem;
-      font-family: monospace;
-      white-space: pre-wrap;
-      max-height: 200px;
-      overflow-y: auto;
-      cursor: text;
+      border-radius: 4px;
+      resize: vertical;
+      line-height: 1.6;
     }
-    #response {
-      white-space: pre-wrap;
-      margin-top: 1rem;
-      padding: 1rem;
-      background: #f4f4f4;
-      border: 1px solid #ccc;
-      max-width: 600px;
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      align-items: center;
+    }
+
+    button {
+      background-color: #006fbf;
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #005a9e;
+    }
+
+    button.secondary {
+      background: #e8e8e8;
+      color: #444;
+    }
+
+    button.secondary:hover {
+      background: #d8d8d8;
+    }
+
+    .sample-link {
+      font-size: 12px;
+      color: #006fbf;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-left: 8px;
+    }
+
+    .loading-area {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      text-align: center;
+      color: #666;
+    }
+
+    .spinner {
+      border: 3px solid rgba(0,0,0,0.1);
+      border-radius: 50%;
+      border-top: 3px solid #006fbf;
+      width: 24px;
+      height: 24px;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #results {
+      display: none;
+      margin-top: 24px;
+    }
+
+    .legend-bar {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #444;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .legend-bar span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-declarative { background: #C0392B; }
+    .dot-analogous { background: #8E44AD; }
+    .dot-topic { background: #D4A017; }
+    .dot-concluding { background: #2E6DA4; }
+    .dot-listing { background: #5B8C5A; }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #888;
+      margin-bottom: 14px;
+      margin-top: 4px;
+    }
+
+    .sentence-row {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 18px;
+      align-items: flex-start;
+    }
+
+    .sentence-num {
+      font-size: 15px;
+      font-weight: 700;
+      color: #999;
+      min-width: 28px;
+      text-align: right;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .sentence-content {
+      flex: 1;
+    }
+
+    .sentence-text {
+      font-size: 15px;
+      line-height: 1.65;
+      color: #202122;
+      margin-bottom: 6px;
+    }
+
+    .hl-declarative {
+      background: rgba(192, 57, 43, 0.18);
+      border-bottom: 2px solid #C0392B;
+      padding: 1px 2px;
+    }
+
+    .hl-analogous {
+      background: rgba(142, 68, 173, 0.18);
+      border-bottom: 2px solid #8E44AD;
+      padding: 1px 2px;
+    }
+
+    .hl-topic {
+      background: rgba(212, 160, 23, 0.25);
+      border-radius: 2px;
+      padding: 1px 2px;
+    }
+
+    .hl-concluding {
+      background: rgba(46, 109, 164, 0.15);
+      border-bottom: 2px solid #2E6DA4;
+      padding: 1px 2px;
+    }
+
+    .hl-listing {
+      background: rgba(91, 140, 90, 0.2);
+      border-bottom: 2px solid #5B8C5A;
+      padding: 1px 2px;
+    }
+
+    .tag-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 4px;
+      line-height: 1.4;
+    }
+
+    .tag-declarative { background: rgba(192, 57, 43, 0.12); color: #922B21; }
+    .tag-analogous { background: rgba(142, 68, 173, 0.12); color: #6C3483; }
+    .tag-topic { background: rgba(212, 160, 23, 0.15); color: #8B6914; }
+    .tag-concluding { background: rgba(46, 109, 164, 0.12); color: #1E4D72; }
+    .tag-listing { background: rgba(91, 140, 90, 0.15); color: #3D6B3C; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 28px 0 20px;
+    }
+
+    .totals-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    .totals-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .total-card {
+      flex: 1;
+      min-width: 120px;
+      padding: 14px 16px;
+      border-radius: 6px;
+    }
+
+    .total-card .num {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .total-card .label {
+      font-size: 11px;
+      color: #555;
+      line-height: 1.3;
+    }
+
+    .tc-declarative { background: rgba(192, 57, 43, 0.08); }
+    .tc-declarative .num { color: #922B21; }
+    .tc-analogous { background: rgba(142, 68, 173, 0.08); }
+    .tc-analogous .num { color: #6C3483; }
+    .tc-topic { background: rgba(212, 160, 23, 0.1); }
+    .tc-topic .num { color: #8B6914; }
+    .tc-concluding { background: rgba(46, 109, 164, 0.08); }
+    .tc-concluding .num { color: #1E4D72; }
+    .tc-listing { background: rgba(91, 140, 90, 0.1); }
+    .tc-listing .num { color: #3D6B3C; }
+
+    .summary-prose {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #202122;
+    }
+
+    .summary-prose strong { font-weight: 700; }
+    .summary-prose p { margin: 0 0 14px; }
+
+    .error-msg {
+      color: #C0392B;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    .qualtrics-note {
+      font-size: 12px;
+      color: #888;
+      font-style: italic;
+      margin-top: 12px;
     }
   </style>
 </head>
 <body>
-  <h2> feedback mechanism</h2>
+  <div class="container">
+    <h2>Paragraph Writing Patterns Analyzer</h2>
+    <p class="intro-text">
+      Paste a single paragraph below. The tool assesses each sentence for declarative strength,
+      analogous arguments, topic sentence quality, concluding sentence alignment, and listing patterns.
+    </p>
 
-<form id="queryForm">
-  <div class="input-group">
-    <div class="input-box">
-      <label for="instructor">Reviewer Essay Comments:</label><br />
-      <textarea name="instructor" id="instructor" rows="4" cols="60" placeholder="Enter your comments here..."></textarea>
+    <label for="input">Enter your paragraph:</label>
+    <textarea id="input" rows="6" placeholder="Paste your paragraph here..."></textarea>
+
+    <div class="btn-row">
+      <button id="analyzeBtn">Analyze</button>
+      <button class="secondary" id="clearBtn">Clear</button>
+      <span class="sample-link" id="loadSample">Load sample paragraph</span>
     </div>
-    <div class="sample-box">
-      <label>Sample Feedback:</label>
-      <div class="sample-content">
-        Excellent writing, strong clear engagement with the course readings. Very well argued paper with lots of examples and a close reading of the text synthesized with textbook. Excellent work.
+
+    <p class="qualtrics-note">All submissions and responses are stored with Qualtrics. NEVER include any personal identifiers.</p>
+
+    <div class="loading-area" id="loadingArea">
+      <div class="spinner"></div>
+      <span>Analyzing paragraph, please wait...</span>
+    </div>
+
+    <div class="error-msg" id="errorMsg" style="display:none"></div>
+
+    <div id="results">
+      <div class="legend-bar">
+        <span>LEGEND</span>
+        <span><span class="legend-dot dot-declarative"></span> Weak declarative</span>
+        <span><span class="legend-dot dot-analogous"></span> Analogous argument</span>
+        <span><span class="legend-dot dot-topic"></span> Topic sentence</span>
+        <span><span class="legend-dot dot-concluding"></span> Concluding sentence</span>
+        <span><span class="legend-dot dot-listing"></span> Listing</span>
       </div>
+
+      <div class="section-label">SENTENCE-BY-SENTENCE BREAKDOWN</div>
+      <div id="sentenceBreakdown"></div>
+
+      <hr class="divider">
+
+      <div class="totals-label">TOTALS</div>
+      <div class="totals-row" id="totalsRow"></div>
+
+      <div class="summary-prose" id="summaryProse"></div>
     </div>
   </div>
-
-  <div class="input-group">
-    <div class="input-box">
-      <label for="essay">Essay for submission:</label><br />
-      <textarea name="essay" id="essay" rows="10" cols="60" placeholder="Paste the student essay here..."></textarea>
-    </div>
-    <div class="sample-box">
-      <label>Sample Essay:</label>
-      <div class="sample-content">
-        Introduction
-     The common concept of sovereignty in international affairs is not a neutral or benign organizing principle. Rather, it is historically based in colonialism and continues to perpetrate systemic racism and structural violence against Indigenous populations globally. As Meghana Nayak and Eric Selbin explain, “lurking behind our passports and citizenship status is the native – the denial, murder, and enslavement of whom made possible the modern nation-state” (Nayak and Selbin 2010: 25). This sharp judgment highlights the basic conflict in International Relations theory’s approach of sovereignty. While IR experts date contemporary sovereignty to the Peace of Westphalia in 1648, presenting it as coming from diplomatic agreement among civilized European powers, this genesis story conceals sovereignty’s underlying foundation in the systematic brutality against Indigenous peoples. The documents that grant us citizenship, the borders that define our states, and the institutions that control international relations all rest upon what Nayak and Selbin characterize as the ‘denial’ of Indigenous political presence. Contemporary IR theory has institutionalized this denial, treating the nation-state system as universal while declaring Indigenous sovereignties invisible or illegitimate. To expose these foundational violences, this essay employs a decolonial methodology that questions the epistemic assumptions underlying standard IR theory. As Erick Viramontes argues, “Decolonizing knowledge entails, in general terms, resisting the underlying criteria of modernity/coloniality for assessing the value of knowledge, while promoting, through institutional designs, a true dialog among knowledges” (Viramontes 2022: 47). This method demonstrates how IR’s adherence to allegedly universal ideas like sovereignty actually reproduces what Viramontes characterizes as the “hierarchy of knowledge” that promotes Western ways of understanding politics while marginalizing Indigenous political thought (Viramontes 2022: 46). Rather than considering Indigenous resistance as a deviation from appropriate governance, a decolonial lens views Indigenous political practices as viable alternatives that expose sovereignty’s colonial origins. This essay advances three interconnected arguments: first, that conventional sovereignty is fundamentally colonial and perpetuates systemic violence against Indigenous peoples; second, that Indigenous resistance constitutes an ongoing response to the violence embedded within the liberal international order; and third, that Indigenous sovereignties offer legitimate alternatives that challenge IR theory’s colonial assumptions. Through this decolonial perspective, Indigenous survival and resistance emerge not as hurdles to international order, but as vital interventions that disclose sovereignty’s actual nature as a tool of racial oppression.
-Historical Foundations of Colonial Sovereignty
-    The popular story that sovereignty evolved from calm diplomatic agreement at Westphalia intentionally hides sovereignty’s purpose as a technology of racial control that demands the constant destruction of Indigenous political authority. This concealment is not theoretical carelessness but structural necessity, sovereignty’s legitimacy rests on disguising its colonial underpinnings and presenting continuous violence against Indigenous peoples as justifiable law enforcement rather than systematic extermination. Sovereignty’s colonial logic was established in 1492 when Christopher Columbus encountered the Taíno people and immediately declared: “They should be good and intelligent servants, for I see that they say very quickly everything that is said to them; and I believe that they would become Christians very easily, for it seemed to me that they had no religion” (Shilliam 2022: 35). This assessment was not incidental observation but the foundational operationalization of what Shilliam identifies as European Christendom’s “hierarchy of human beings,” where Europeans occupied “the apex position, thus justifying the conquest of non-European, non-Christian peoples” (Shilliam 2022: 25). Columbus’s immediate categorization of Indigenous peoples as potential servants established the core principle that would become sovereignty’s organizing logic: political legitimacy depends on racial and religious categories that position European Christians as inherently sovereign while systematically denying political authority to Indigenous and non-European peoples.
-        Crucially, this hierarchy did not evaporate with Westphalia in 1648 but became codified as sovereignty’s governing concept. The Peace of Westphalia did not transcend 1492’s colonial logic but formalized it as international law, applying the norm of non-intervention only within the European "family of nations" while preserving conquest as the guiding paradigm for Indigenous areas (Shilliam 2022: 36). What IR theory celebrates as sovereignty’s diplomatic birth was actually the systematization of a global order where political legitimacy remained dependent on the racial and religious categories established by Columbus. Sovereignty thus operates as the method via which 1492’s colonial hierarchy established the foundation of the international system, necessitating constant Indigenous eradication to sustain its exclusive claims to territorial control and justified aggression. This eliminatory logic became operationalized through state institutions designed to methodically undermine Indigenous political systems. The Canadian situation displays sovereignty’s structural prerequisites clearly. As Bell and Schreiner describe, “Since Confederation, the Mounties have been involved in wide-ranging state-building missions with the purpose of securing Canadian sovereignty, in part through land and resource acquisition, and the denial of Indigenous sovereignties”(Bell and Schreiner 2018: 114). This “denial of Indigenous sovereignties” was fundamental rather than accidental to Canadian state construction since sovereignty could only be created by establishing that Indigenous nations did not possess legitimate political authority. The RCMP’s role indicates sovereignty’s operational mechanism: it acts through what Bell and Schreiner characterize as “civilizing techniques designed to eliminate Indigenous political alternatives” (Bell and Schreiner 2018: 111). Contemporary Canadian state actions reveal that sovereignty’s dependency on Indigenous removal is not historical artifact but actively current necessity. When Indigenous groups take control over their territories, they are systematically “characterized by the provincial government as criminals and terrorists,” (Bell and Schreiner 2018: 120). This prosecution follows sovereignty’s underlying logic established in 1492: Indigenous political assertion inherently becomes an unlawful challenge to state power that must be eradicated by police violence. The automatic linkage of Indigenous political assertion with terrorism shows sovereignty’s essential requirement, it cannot allow Indigenous political existence because acknowledging Indigenous authority would undercut the state’s exclusive claim to legitimize violence. The direct continuity from Columbus’s immediate categorization of the Taíno as potential servants to contemporary Canada’s characterization of Indigenous land defenders as terrorists demonstrates how sovereignty operates through the systematic denial of Indigenous political legitimacy across centuries. This eliminatory violence remains routinely invisible because, as Nayak and Selbin illustrate, IR theory operates by “masking the genocide of indigenous peoples that is its foundation,” thereby naturalizing sovereignty’s need on Indigenous elimination (Nayak and Selbin 2010: 25). Contemporary IR theory’s failure to theorize this ongoing violence is not oversight but necessity, acknowledging sovereignty’s active elimination of Indigenous political alternatives would expose the liberal international order’s dependence on continuous colonial domination rather than its claimed historical transcendence of colonialism. The theoretical concealment promotes sovereignty’s continuous operation by perpetuating the Westphalian myth that shows sovereignty as coming from European diplomatic invention rather than colonial invasion. This allows current nations to characterize ongoing Indigenous removal as legitimate law enforcement rather than colonial brutality, sustaining the pretence that sovereignty constitutes political growth rather than institutionalized oppression. Sovereignty thus operates as an active technology of colonial domination whose historical foundations in 1492’s racial hierarchy continue operating through modern state institutions, requiring continuous Indigenous elimination to maintain the legitimacy of the liberal international order built on systematic denial of Indigenous political authority.
-Indigenous Resistance as Response to Liberal Violence
-      Indigenous resistance movements are sometimes mischaracterized by liberal international thought as anti-modern or apolitical. In truth, these movements present a fundamental critique of the liberal international system by revealing its reliance on colonial dispossession and the exclusion of Indigenous sovereignties. Indigenous peoples do not oppose government per se; they contest a governance system predicated on the deliberate rejection of their political authority. As Nayak and Selbin argue, “people understand quite well when they’re being ‘screwed over’ and to look for places around the edges to see what they can leverage out of the situation” (Nayak and Selbin 2010: 22). This reveals a political clarity and strategy that challenges descriptions of Indigenous resistance as romantic or regressive. Rather than living outside the international system, Indigenous peoples have always been crucial to its construction. The contemporary nation-state developed not through peaceful social arrangements, but by conquest and extermination. As Nayak and Selbin remark, “lurking behind our passports and citizenship status is the native, the denial, murder, and enslavement of whom made possible the modern nation-state” (2010: 24). The liberal state’s claim to universality depends on identifying Indigenous peoples as external to the political community either as relics of the past or as threats to national unity. Indigenous resistance exposes this logic by asserting alternative forms of political authority that the liberal state cannot acknowledge without damaging its own legitimacy. The role of the Royal Canadian Mounted Police (RCMP) highlights how policing has functioned as a weapon of settler colonial expansion rather than neutral law enforcement. From their formation, the Mounties were deployed not simply to administer Canadian law but to assert Canadian presence over vast Indigenous regions where state authority was otherwise absent. As Bell and Schreiner explain, the RCMP “was central to bringing Canada to fruition as a sovereign nation in ideational, legal, and territorial terms,” acting as “the most prominent agents of both symbolic and developmental sovereignty” and performing the work of demonstrating “the fact of Canadian sovereignty” (Bell and Schreiner 2018: 122). This was not merely an issue of governance, it was an intellectual project. The Mounties reinterpreted Indigenous political power as criminal subversion, replacing past diplomatic interactions with forcible suppression. In doing so, they operationalized a sort of liberal imperialism that characterized Indigenous resistance as disorder, and colonial expansion as the restoration of peace and order. The proposal for “plurinationality” by the Confederación de Nacionalidades Indígenas del Ecuador (CONAIE), for instance, directly challenges the assumption that a legitimate political community must be singular and homogenous. As Shilliam argues, the demand that the Ecuadorian constitution recognize the “plurinational” character of the state “represents a significant challenge to the norm of state sovereignty” (Shilliam 2022: 39). Such challenges show the fragility of liberal universalism, which cannot allow real political difference without destroying its own foundations. This tension often culminates in violence. Indigenous resistance is not answered with democratic discourse, but with policing actions meant to suppress it. “Indigenous protest policing operations are principally oriented towards neutralizing threats to suburban development and resource extraction projects,” Bell and Schreiner add, revealing the economic priorities behind state brutality (2018: 120). These activities reveal that what is described as “law enforcement” is often the preservation of settler capitalism and racialized sovereignty. The continual character of Indigenous resistance makes it evident that colonialism is not a concluded historical process, but an active structure. The fact that Indigenous people continue to resist pipeline building, land grabs, and resource extraction indicates that colonial dispossession remains ongoing, not historical. Movements like Idle No More do not originate from static cultural concerns but from immediate encounters with what Bell and Schreiner call “twin threats to capital accumulation and Canadian (or settler) state sovereignty” (2018: 120). These movements reveal that Indigenous political options have not been transcended but purposefully suppressed. The liberal system depends on this suppression to sustain the idea that settler sovereignty is total and unchallenged. In sum, Indigenous resistance movements show the profound conflicts at the heart of the liberal world system. They reveal that liberal nations have not evolved beyond colonialism but remain fundamentally dependent on the continuous elimination of Indigenous political authority. Far from being antiquated or irrational, Indigenous resistance represents a coherent and strong critique that shows how claims to sovereignty and legitimacy continue to rest on exclusion, violence, and denial.
-Decolonial Approach and Indigenous Sovereignties
-  IR theory’s methodological assumptions consistently exclude Indigenous political practices not by oversight but via deliberate epistemic decisions that prioritize Western methods of knowing. Viramontes illustrates that traditional International Relations functions through the ‘hierarchy of knowledge established by the Colonial Matrix of Power,’ which regards “modern Western science as the most suitable method for generating truth” (Viramontes 2022: 46). This hierarchy provides what Viramontes characterizes as ‘objectivism and modern linear thinking as ordering principles’ that render Indigenous governing systems unreadable by definition (Viramontes 2022: 46). The exclusion is not accidental, Indigenous legal systems that operate through ‘accountability, storytelling, and justice targeted at healing’ cannot be recognized under IR frameworks that demand scientific objectivity and linear causation (Nayak and Selbin 2010: 37). Therefore, IR theory’s claim to universal validity paradoxically depends upon ignoring the very knowledge systems that would show its cultural particularity. This scientific colonialism ensures that Indigenous political processes appear rudimentary or useless rather than sophisticated alternatives to state sovereignty. Indigenous governance systems offer real alternatives to state sovereignty that work through fundamentally distinct principles of political organization, suggesting that the nation-state is not the inevitable endpoint of political evolution. The contrast becomes evident when examining Indigenous legal traditions that prioritize ‘accountability, narrative, and justice aimed at healing, and rooted in the underlying cause of the issue at hand’ rather than the ‘burden of proof, legal knowledge, adversarial process, and procedural outcome’ that characterizes Western legal systems (Nayak and Selbin 2010: 37-38). This disagreement is not only procedural but indicates conflicting notions of political authority itself. Indigenous legal systems prioritize the restoration of connections over the determination of guilt, illustrating what Nayak and Selbin characterize as governance founded on responsibility rather than control (Nayak and Selbin 2010: 38). Similarly, Indigenous economic principles where ‘Land and moveable property are not gathered for riches; there is no right to alienate the land itself’ directly contradict the commodification of territory that supports both private property and state sovereignty (Nayak and Selbin 2010: 38). These acts illustrate that political organization can work without the exclusivity and control that define state sovereignty. Indigenous administration therefore reveals the practical viability of what Viramontes envisions as political structures that transcend ‘the gap between the ethnic and the geometric centers of observation’ that enables colonial control (Viramontes 2022: 50). Indigenous sovereignties illustrate the incapacity of International Relations theory to embrace authentic political diversity, demonstrating that the discipline’s fundamental notions rely on perpetuating colonial hierarchies rather than overcoming them. When Indigenous movements like CONAIE demand recognition of Ecuador’s “plurinational character,” they are not seeking inclusion within current frameworks but opposing what Nayak and Selbin characterize as ‘the norm of state sovereignty’ itself (Nayak and Selbin 2010: 39). This demand exposes the colonial logic driving IR's adherence to what Viramontes called “the nation-state and its illusory characters” universal political form rather than “culturally specific configuration” (Viramontes 2022: 50). International Relations theory cannot incorporate plurinationalism without relinquishing its fundamental premise that a viable political community necessitates a distinctive identity and exclusive geographical sovereignty. The violent state response to Indigenous political assertions, documented by Bell and Schreiner through significant police deployments against land defenders, reveals that liberal institutions will deploy coercive force rather than accept Indigenous political legitimacy (Bell and Schreiner 2018: 120). This violence is not aberrant but necessary since Indigenous sovereignties represent what Viramontes characterizes as ‘the pluriverse’ where many political temporalities coexist without hierarchical ordering (Viramontes 2022: 48). The failure of IR theory to conceptualize such coexistence reveals its reliance on the colonial power structure that regards European political systems as ultimate developmental stages rather than historical constraints.
-Conclusion
-    The evaluation demonstrates that sovereignty maintains its colonial roots which continue to operate as core structural elements that need Indigenous elimination to preserve their consistency. Through decolonial analysis IR theory demonstrates how supposedly neutral concepts such as territorial integrity and non-intervention and state legitimacy maintain the colonial ranking system from 1492 which establishes European political models as universal but conceals Indigenous governance systems. Sovereignty functions as a critical nation-state origin myth according to Nayak and Selbin (2010: 23) since it conceals ongoing colonial domination and the violence documented by Bell and Schreiner through RCMP operations and the epistemological exclusions revealed by Viramontes in IR methodology and the political acumen of Indigenous resistance movements studied by Nayak and Selbin. The elimination of sovereignty depends on the elimination of Indigenous peoples which leads to their resistance against political modernity. This ongoing resistance spanning five centuries shows that colonial violence operates as a permanent structural element which liberal institutions maintain because they need to eliminate authentic political differences. Native governments present advanced critiques which unveil the arbitrary nature and violent foundations of the liberal international system. The acceptance of Indigenous sovereignties as valid political systems necessitates a fundamental shift in IR theory and international practice instead of inserting them into current theoretical structures. According to Viramontes, true decolonization means fighting against the basic principles of modernity/coloniality which determine knowledge value instead of including Indigenous perspectives in colonial institutions (Viramontes 2022: 47). The fundamental assumption in IR about nation-states being the final stage of political development needs to be abandoned for embracing the pluriverse framework which acknowledges multiple political systems existing without hierarchical relationships (Viramontes 2022: 48). International institutions need to progress past their current acceptance of Indigenous cultural rights by establishing Indigenous political control over their territories and resources. The UN Declaration on the Rights of Indigenous Peoples serves as the first step toward transformation yet actual change needs the recognition of ‘overlapping sovereignties’ that oppose Westphalian system’s exclusive territorial control assumption (Nayak and Selbin 2010: 39). Future research needs to adopt Viramontes’s recommendation for a genuine dialogue between different forms of knowledge by using Indigenous political thought as both an analytical framework and a theoretical system to expose alternatives to colonial rule (Viramontes 2022: 47). The essential reorganization of IR theory will enable it to break free from its colonial roots and achieve the political systems which Indigenous movements have fought for through building relationships instead of maintaining domination.
-
-References 
-Bell, C., & Schreiner, K. (2018). The international relations of police power in settler colonialism: The “civilizing” mission of Canada’s Mounties. International Journal: Canada’s Journal of Global Policy Analysis, 73(1), 111–128. https://doi.org/10.1177/0020702018768480
-Nayak, M., & Selbin, E. (2010). Decentering international relations (Chapter 2, "Indigeneity"). Bloomsbury Publishing.
-Shilliam, R. (2022). DISCOVERY, CONQUEST AND COLONIALISM CHAPTER 3. In FOUNDATIONS OF INTERNATIONAL RELATIONS (pp. 25–41). essay, Bloomsbury Publishing. 
-Viramontes, E. (2022). Questioning the quest for Pluralism: How Decolonial is Non-Western IR? Alternatives, 47(1), 45-63. https://doi.org/10.1177/03043754211064545 (Original work published 2022)
-
-
-      </div>
-    </div>
-  </div>
-
-<p><em>All submissions and responses are stored with Qualtrics. NEVER include any personal identifiers.</em></p>
-<button type="submit">Submit</button>
-</form>
-
-<h3>Response:</h3>
-<pre id="response"></pre>
 
 <script>
-  const form = document.getElementById("queryForm");
-  const responseBox = document.getElementById("response");
+const SAMPLE = `IR theory's methodological assumptions consistently exclude Indigenous political practices not by oversight but via deliberate epistemic decisions that prioritize Western methods of knowing. Viramontes illustrates that traditional International Relations functions through the 'hierarchy of knowledge established by the Colonial Matrix of Power,' which regards "modern Western science as the most suitable method for generating truth" (Viramontes 2022: 46). This hierarchy provides what Viramontes characterizes as 'objectivism and modern linear thinking as ordering principles' that render Indigenous governing systems unreadable by definition (Viramontes 2022: 46). The exclusion is not accidental, Indigenous legal systems that operate through 'accountability, storytelling, and justice targeted at healing' cannot be recognized under IR frameworks that demand scientific objectivity and linear causation (Nayak and Selbin 2010: 37). Therefore, IR theory's claim to universal validity paradoxically depends upon ignoring the very knowledge systems that would show its cultural particularity. This scientific colonialism ensures that Indigenous political processes appear rudimentary or useless rather than sophisticated alternatives to state sovereignty.`;
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    responseBox.textContent = "Loading...";
+// ── BACKEND URL — update to your deployed Deno endpoint ──
+const API_URL = "https://irfeedback0609.deno.dev/";
 
-    const instructor = document.getElementById("instructor").value;
-    const essay = document.getElementById("essay").value;
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-    const combinedQuery = `
-db2025
-The instructor’s in-text comments are authoritative and must guide all feedback. Do not override, soften, or generalize them.
+function highlightPhrase(sentenceText, phrase, hlClass) {
+  const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(${escaped})`, 'gi');
+  if (re.test(sentenceText)) {
+    return sentenceText.replace(re, `<span class="${hlClass}">$1</span>`);
+  }
+  return sentenceText;
+}
 
-# Instructor Comments:
-${instructor}
+function renderResults(data) {
+  const breakdown = document.getElementById('sentenceBreakdown');
+  const totalsRow = document.getElementById('totalsRow');
+  const summaryProse = document.getElementById('summaryProse');
 
-# Student Essay:
-${essay}
+  const typeToClass = {
+    declarative: 'declarative',
+    analogous: 'analogous',
+    topic: 'topic',
+    concluding: 'concluding',
+    listing: 'listing',
+  };
 
-Please provide structured feedback under the six db2025 categories. Feedback must be concise, evaluative, and written in the instructor’s voice.
-    `.trim();
+  const typeToLabel = {
+    declarative: 'Weak declarative',
+    analogous: 'Analogous argument',
+    topic: 'Topic sentence',
+    concluding: 'Concluding sentence',
+    listing: 'Listing',
+  };
 
-    try {
-      const res = await fetch("https://irfeedback0609.deno.dev/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: combinedQuery }),
-      });
-
-      const text = await res.text();
-      responseBox.textContent = text;
-    } catch (err) {
-      responseBox.textContent = "Error contacting server.";
+  let breakdownHtml = '';
+  for (const s of data.sentences) {
+    let textHtml = escHtml(s.text);
+    const sortedFlags = [...s.flags].sort((a, b) => b.phrase.length - a.phrase.length);
+    for (const f of sortedFlags) {
+      const cls = 'hl-' + (typeToClass[f.type] || f.type);
+      textHtml = highlightPhrase(textHtml, f.phrase, cls);
     }
-  });
-</script>
 
+    let tagsHtml = '';
+    if (s.flags.length > 0) {
+      tagsHtml = '<div class="tag-row">' + s.flags.map(f => {
+        const tagCls = 'tag-' + (typeToClass[f.type] || f.type);
+        const label = typeToLabel[f.type] || f.type;
+        let tagText = label;
+        if (f.phrase) tagText += ` \u2014 \u201c${escHtml(f.phrase)}\u201d`;
+        if (f.explanation) tagText += ` ${escHtml(f.explanation)}`;
+        return `<span class="tag ${tagCls}">${tagText}</span>`;
+      }).join('') + '</div>';
+    }
+
+    breakdownHtml += `
+      <div class="sentence-row">
+        <div class="sentence-num">${s.number}</div>
+        <div class="sentence-content">
+          <div class="sentence-text">${textHtml}</div>
+          ${tagsHtml}
+        </div>
+      </div>`;
+  }
+  breakdown.innerHTML = breakdownHtml;
+
+  const t = data.totals;
+  totalsRow.innerHTML = `
+    <div class="total-card tc-declarative"><div class="num">${t.declarative}</div><div class="label">Weak declarative</div></div>
+    <div class="total-card tc-analogous"><div class="num">${t.analogous}</div><div class="label">Analogous arguments</div></div>
+    <div class="total-card tc-topic"><div class="num">${t.topic}</div><div class="label">Topic sentence issues</div></div>
+    <div class="total-card tc-concluding"><div class="num">${t.concluding}</div><div class="label">Concluding mismatch</div></div>
+    <div class="total-card tc-listing"><div class="num">${t.listing}</div><div class="label">Listing patterns</div></div>`;
+
+  let summaryHtml = escHtml(data.summary)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  summaryProse.innerHTML = `<p>${summaryHtml}</p>`;
+
+  document.getElementById('results').style.display = 'block';
+}
+
+async function analyzeParagraph(text) {
+  const loadingArea = document.getElementById('loadingArea');
+  const errorMsg = document.getElementById('errorMsg');
+  const resultsDiv = document.getElementById('results');
+
+  resultsDiv.style.display = 'none';
+  errorMsg.style.display = 'none';
+  loadingArea.style.display = 'block';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: text })
+    });
+
+    const raw = await res.text();
+    const cleaned = raw.replace(/<!--.*?-->/g, '').trim();
+    const data = JSON.parse(cleaned);
+
+    if (data.error) throw new Error(data.error);
+    renderResults(data);
+  } catch (err) {
+    errorMsg.textContent = 'Error: ' + err.message;
+    errorMsg.style.display = 'block';
+  } finally {
+    loadingArea.style.display = 'none';
+  }
+}
+
+document.getElementById('analyzeBtn').addEventListener('click', () => {
+  const text = document.getElementById('input').value.trim();
+  if (!text) return;
+  analyzeParagraph(text);
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  document.getElementById('input').value = '';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('errorMsg').style.display = 'none';
+});
+
+document.getElementById('loadSample').addEventListener('click', () => {
+  document.getElementById('input').value = SAMPLE;
+});
+
+document.getElementById('input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    document.getElementById('analyzeBtn').click();
+  }
+});
+</script>
 </body>
 </html>
