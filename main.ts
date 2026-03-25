@@ -4,7 +4,6 @@ const AZURE_API_KEY = Deno.env.get("AZURE_OPENAI_KEY");
 const QUALTRICS_API_TOKEN = Deno.env.get("QUALTRICS_API_TOKEN");
 const QUALTRICS_SURVEY_ID = Deno.env.get("QUALTRICS_SURVEY_ID");
 const QUALTRICS_DATACENTER = Deno.env.get("QUALTRICS_DATACENTER");
-const SYLLABUS_LINK = Deno.env.get("SYLLABUS_LINK") || "";
 
 const AZURE_DEPLOYMENT_NAME = "gpt-4.1-mini";
 const AZURE_ENDPOINT = "https://chatbot-api-western.openai.azure.com";
@@ -37,23 +36,29 @@ serve(async (req: Request): Promise<Response> => {
     return new Response("Missing Azure API key", { status: 500 });
   }
 
-  const syllabus = await Deno.readTextFile("syllabus.txt").catch(() =>
-    "Error loading syllabus."
+  const raw = body.query.trim();
+  let guidance = "";
+  let paragraph = raw;
+
+  // Support db2025 instructor override
+  const db2025Index = raw.indexOf("db2025");
+  if (db2025Index !== -1) {
+    paragraph = raw.substring(0, db2025Index).trim();
+    guidance = raw.substring(db2025Index + 6).trim();
+  }
+
+  const criteria = await Deno.readTextFile("criteria.md").catch(() =>
+    "Error loading criteria."
   );
 
   const messages = [
     {
       role: "system",
-      content:
-        "You are an accurate assistant. Always include a source URL if possible.",
-    },
-    {
-      role: "system",
-      content: `Here is important context from syllabus.txt:\n${syllabus}`,
+      content: `${criteria}\n\n${guidance ? `Instructor note: ${guidance}\n\n` : ""}Respond ONLY with valid JSON. No markdown fences, no preamble.`,
     },
     {
       role: "user",
-      content: body.query,
+      content: `Analyze this paragraph:\n\n${paragraph}`,
     },
   ];
 
@@ -67,14 +72,14 @@ serve(async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         messages,
+        response_format: { type: "json_object" },
       }),
     }
   );
 
   const azureJson = await azureResponse.json();
-  const baseResponse =
-    azureJson?.choices?.[0]?.message?.content || "No response from Azure OpenAI";
-  const result = `${baseResponse}\n\nThere may be errors in my responses; always refer to the course web page: ${SYLLABUS_LINK}`;
+  const result =
+    azureJson?.choices?.[0]?.message?.content || '{"error": "No response from Azure OpenAI"}';
 
   let qualtricsStatus = "Qualtrics not called";
 
@@ -101,9 +106,9 @@ serve(async (req: Request): Promise<Response> => {
     qualtricsStatus = `Qualtrics status: ${qt.status}`;
   }
 
-  return new Response(`${result}\n<!-- ${qualtricsStatus} -->`, {
+  return new Response(result, {
     headers: {
-      "Content-Type": "text/plain",
+      "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
     },
   });
