@@ -35,6 +35,11 @@
 //   QUALTRICS_DATACENTER  (Text)    e.g. uwo.eu
 //   MAX_TOKENS            (Text)    optional, defaults to 2000
 //
+//   --- optional rate limiting ---
+//   RL_LIMIT              (Text)    optional, requests per 60s per IP (default 20)
+//   RATE_LIMITER          (Binding) optional, native Workers rate-limit binding.
+//                                   If absent, a built-in in-memory limiter is used.
+//
 // Qualtrics survey must have embedded data fields: queryText, responseText
 // (and feedback, if you later add thumbs-up/down).
 
@@ -43,6 +48,51 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
+
+// ── Rate limiting ──────────────────────────────────────────────────────────
+// Caps requests per client IP to prevent runaway cost/abuse. Two modes:
+//
+//   1. If you add a native Workers Rate Limiting binding named RATE_LIMITER,
+//      it is used automatically — hard, account-wide enforcement. (Configured
+//      via wrangler, since the dashboard editor can't add this binding.)
+//
+//   2. Otherwise, the built-in in-memory limiter below runs with zero setup.
+//      It is per-isolate and per-Cloudflare-location, so it is best-effort: it
+//      reliably blunts a single client hammering the endpoint in a loop, but
+//      counters reset as isolates recycle. Good enough for a private student
+//      tool; use mode 1 if you need strict limits.
+//
+// Tune with the RL_LIMIT env var (requests per 60s per IP; default 20).
+const ipHits = new Map(); // ip -> array of request timestamps (ms)
+const RL_WINDOW_MS = 60 * 1000;
+
+function memoryLimit(key, limit) {
+  const now = Date.now();
+  const recent = (ipHits.get(key) || []).filter(t => now - t < RL_WINDOW_MS);
+  if (recent.length >= limit) {
+    ipHits.set(key, recent);
+    return false;
+  }
+  recent.push(now);
+  ipHits.set(key, recent);
+  // Bound memory: occasionally drop IPs with no recent hits.
+  if (ipHits.size > 5000) {
+    for (const [k, v] of ipHits) {
+      if (v.every(t => now - t >= RL_WINDOW_MS)) ipHits.delete(k);
+    }
+  }
+  return true;
+}
+
+async function withinRateLimit(req, env) {
+  const ip = req.headers.get("CF-Connecting-IP") || "unknown";
+  const limit = parseInt(env.RL_LIMIT || "20", 10);
+  if (env.RATE_LIMITER && typeof env.RATE_LIMITER.limit === "function") {
+    const { success } = await env.RATE_LIMITER.limit({ key: ip });
+    return success;
+  }
+  return memoryLimit(ip, limit);
+}
 
 export default {
   async fetch(req, env) {
@@ -60,6 +110,17 @@ export default {
       body = await req.json();
     } catch {
       return new Response("Invalid JSON", { status: 400, headers: corsHeaders });
+    }
+
+    // Rate limit every POST (analysis and feedback alike).
+    if (!(await withinRateLimit(req, env))) {
+      return new Response(
+        JSON.stringify({ error: "Rate limit reached. Please wait a minute and try again." }),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json", "Retry-After": "60", ...corsHeaders },
+        }
+      );
     }
 
     // Helper: log a row to Qualtrics. Returns a status string (never throws).
@@ -117,15 +178,8 @@ export default {
       );
     }
 
-    // --- Parse the submission + db2025 instructor override -------------------
-    const raw = (body.query || "").trim();
-    let guidance = "";
-    let paragraph = raw;
-    const db2025Index = raw.indexOf("db2025");
-    if (db2025Index !== -1) {
-      paragraph = raw.substring(0, db2025Index).trim();
-      guidance = raw.substring(db2025Index + 6).trim();
-    }
+    // --- Read the submitted paragraph ---------------------------------------
+    const paragraph = (body.query || "").trim();
 
     // --- Load criteria.md from GitHub at runtime ----------------------------
     const criteria = await fetch(CRITERIA_URL, { cache: "no-store" })
@@ -135,7 +189,7 @@ export default {
     const messages = [
       {
         role: "system",
-        content: `${criteria}\n\n${guidance ? `Instructor note: ${guidance}\n\n` : ""}Respond ONLY with valid JSON. No markdown fences, no preamble.`,
+        content: `${criteria}\n\nRespond ONLY with valid JSON. No markdown fences, no preamble.`,
       },
       {
         role: "user",

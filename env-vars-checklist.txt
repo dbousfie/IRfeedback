@@ -28,6 +28,7 @@ QUALTRICS_API_TOKEN     Secret    from Qualtrics → Account Settings → API
 QUALTRICS_SURVEY_ID     Text      SV_... (from the survey URL)
 QUALTRICS_DATACENTER    Text      e.g. uwo.eu
 MAX_TOKENS              Text      optional, defaults to 2000
+RL_LIMIT                Text      optional, requests per 60s per IP (default 20)
 
 Qualtrics survey embedded data fields needed: queryText, responseText
 (add "feedback" too if you later wire up thumbs-up/down buttons)

@@ -96,13 +96,17 @@ Change it to your worker URL. Commit.
 - Wait 1–2 minutes for the first build, then visit the published URL (e.g., `https://<username>.github.io/<repo>/`)
 - For Brightspace: edit `brightspace.html`, set the iframe `src` to your published GitHub Pages URL, and paste it as a content item or widget.
 
-## Instructor guidance feature (db2025)
+## Rate limiting
 
-You can prepend a submission with a private instructor note using the `db2025` marker:
+The worker caps requests per client IP to prevent runaway model cost or abuse. Set `RL_LIMIT` (requests per 60 seconds per IP; default 20) in the dashboard. By default this uses a built-in in-memory limiter that needs no setup — it's best-effort (per Cloudflare location, resets as isolates recycle) but reliably stops a single client looping the endpoint.
+
+For strict, account-wide enforcement, add a native Workers Rate Limiting binding named `RATE_LIMITER`; the worker uses it automatically when present. That binding is configured via wrangler (the dashboard editor can't add it), e.g. in `wrangler.jsonc`:
+```jsonc
+"ratelimits": [
+  { "name": "RATE_LIMITER", "namespace_id": "1001", "simple": { "limit": 20, "period": 60 } }
+]
 ```
-This paragraph leans hard on promotional language; be strict. db2025
-```
-Text before `db2025` is treated as the paragraph; text after it is passed to the model as a hidden instructor note that shapes the analysis but is not shown to the student.
+Note: WAF rate-limiting *rules* in the Security dashboard do **not** apply to `*.workers.dev` URLs — they require a custom domain added to Cloudflare as a zone.
 
 ## Day-to-day editing
 
