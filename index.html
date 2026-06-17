@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paragraph Writing Patterns Analyzer</title>
+  <title>Annoying AI Tendencies Detector</title>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -126,7 +126,7 @@
 
     .legend-bar {
       display: flex;
-      gap: 18px;
+      gap: 14px;
       flex-wrap: wrap;
       margin-bottom: 16px;
       font-size: 12px;
@@ -136,7 +136,9 @@
       letter-spacing: 0.5px;
     }
 
-    .legend-bar span {
+    .legend-bar > .legend-title { letter-spacing: 0.8px; }
+
+    .legend-bar span.legend-item {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -148,12 +150,6 @@
       border-radius: 50%;
       display: inline-block;
     }
-
-    .dot-declarative { background: #C0392B; }
-    .dot-analogous { background: #8E44AD; }
-    .dot-topic { background: #D4A017; }
-    .dot-concluding { background: #2E6DA4; }
-    .dot-listing { background: #5B8C5A; }
 
     .section-label {
       font-size: 12px;
@@ -182,9 +178,7 @@
       flex-shrink: 0;
     }
 
-    .sentence-content {
-      flex: 1;
-    }
+    .sentence-content { flex: 1; }
 
     .sentence-text {
       font-size: 15px;
@@ -193,33 +187,7 @@
       margin-bottom: 6px;
     }
 
-    .hl-declarative {
-      background: rgba(192, 57, 43, 0.18);
-      border-bottom: 2px solid #C0392B;
-      padding: 1px 2px;
-    }
-
-    .hl-analogous {
-      background: rgba(142, 68, 173, 0.18);
-      border-bottom: 2px solid #8E44AD;
-      padding: 1px 2px;
-    }
-
-    .hl-topic {
-      background: rgba(212, 160, 23, 0.25);
-      border-radius: 2px;
-      padding: 1px 2px;
-    }
-
-    .hl-concluding {
-      background: rgba(46, 109, 164, 0.15);
-      border-bottom: 2px solid #2E6DA4;
-      padding: 1px 2px;
-    }
-
-    .hl-listing {
-      background: rgba(91, 140, 90, 0.2);
-      border-bottom: 2px solid #5B8C5A;
+    .hl {
       padding: 1px 2px;
     }
 
@@ -238,11 +206,11 @@
       line-height: 1.4;
     }
 
-    .tag-declarative { background: rgba(192, 57, 43, 0.12); color: #922B21; }
-    .tag-analogous { background: rgba(142, 68, 173, 0.12); color: #6C3483; }
-    .tag-topic { background: rgba(212, 160, 23, 0.15); color: #8B6914; }
-    .tag-concluding { background: rgba(46, 109, 164, 0.12); color: #1E4D72; }
-    .tag-listing { background: rgba(91, 140, 90, 0.15); color: #3D6B3C; }
+    .clean-note {
+      font-size: 13px;
+      color: #5B8C5A;
+      font-style: italic;
+    }
 
     .divider {
       border: none;
@@ -267,7 +235,7 @@
     }
 
     .total-card {
-      flex: 1;
+      flex: 1 1 120px;
       min-width: 120px;
       padding: 14px 16px;
       border-radius: 6px;
@@ -285,17 +253,6 @@
       color: #555;
       line-height: 1.3;
     }
-
-    .tc-declarative { background: rgba(192, 57, 43, 0.08); }
-    .tc-declarative .num { color: #922B21; }
-    .tc-analogous { background: rgba(142, 68, 173, 0.08); }
-    .tc-analogous .num { color: #6C3483; }
-    .tc-topic { background: rgba(212, 160, 23, 0.1); }
-    .tc-topic .num { color: #8B6914; }
-    .tc-concluding { background: rgba(46, 109, 164, 0.08); }
-    .tc-concluding .num { color: #1E4D72; }
-    .tc-listing { background: rgba(91, 140, 90, 0.1); }
-    .tc-listing .num { color: #3D6B3C; }
 
     .summary-prose {
       font-size: 15px;
@@ -322,10 +279,14 @@
 </head>
 <body>
   <div class="container">
-    <h2>Paragraph Writing Patterns Analyzer</h2>
+    <h2>Annoying AI Tendencies Detector</h2>
     <p class="intro-text">
-      Paste a single paragraph below. The tool assesses each sentence for declarative strength,
-      analogous arguments, topic sentence quality, concluding sentence alignment, and listing patterns.
+      Paste a paragraph below. The tool reads it sentence by sentence and flags eleven stylistic
+      tendencies that commonly signal AI-generated or AI-polished prose &mdash; reflexive caveats,
+      undue emphasis on significance, canned notability and media coverage, superficial analysis,
+      promotional language, vague attribution, outline-like conclusions, title-as-proper-noun leads,
+      avoidance of plain "is/are", negative parallelisms, and em-dash overuse. These are tendencies,
+      not proof of authorship: a human can write any of them, and a careful editor can remove them.
     </p>
 
     <label for="input">Enter your paragraph:</label>
@@ -347,14 +308,7 @@
     <div class="error-msg" id="errorMsg" style="display:none"></div>
 
     <div id="results">
-      <div class="legend-bar">
-        <span>LEGEND</span>
-        <span><span class="legend-dot dot-declarative"></span> Weak declarative</span>
-        <span><span class="legend-dot dot-analogous"></span> Analogous argument</span>
-        <span><span class="legend-dot dot-topic"></span> Topic sentence</span>
-        <span><span class="legend-dot dot-concluding"></span> Concluding sentence</span>
-        <span><span class="legend-dot dot-listing"></span> Listing</span>
-      </div>
+      <div class="legend-bar" id="legendBar"></div>
 
       <div class="section-label">SENTENCE-BY-SENTENCE BREAKDOWN</div>
       <div id="sentenceBreakdown"></div>
@@ -369,22 +323,56 @@
   </div>
 
 <script>
-const SAMPLE = `IR theory's methodological assumptions consistently exclude Indigenous political practices not by oversight but via deliberate epistemic decisions that prioritize Western methods of knowing. Viramontes illustrates that traditional International Relations functions through the 'hierarchy of knowledge established by the Colonial Matrix of Power,' which regards "modern Western science as the most suitable method for generating truth" (Viramontes 2022: 46). This hierarchy provides what Viramontes characterizes as 'objectivism and modern linear thinking as ordering principles' that render Indigenous governing systems unreadable by definition (Viramontes 2022: 46). The exclusion is not accidental, Indigenous legal systems that operate through 'accountability, storytelling, and justice targeted at healing' cannot be recognized under IR frameworks that demand scientific objectivity and linear causation (Nayak and Selbin 2010: 37). Therefore, IR theory's claim to universal validity paradoxically depends upon ignoring the very knowledge systems that would show its cultural particularity. This scientific colonialism ensures that Indigenous political processes appear rudimentary or useless rather than sophisticated alternatives to state sovereignty.`;
+// ── CATEGORY CONFIG ─────────────────────────────────────────────
+// One object drives the legend, highlight colours, tags, and totals.
+// To add, remove, or rename a tendency, edit only this map (and the
+// matching `type` keys in criteria.md). `key` must match the JSON
+// `type` returned by the backend.
+const CATS = {
+  caveats:      { label: "Caveats / hedging",            color: "#64748B" },
+  significance: { label: "Undue significance",           color: "#DC2626" },
+  notability:   { label: "Notability & coverage",        color: "#D97706" },
+  superficial:  { label: "Superficial analysis",         color: "#0D9488" },
+  promotional:  { label: "Promotional language",         color: "#DB2777" },
+  vague:        { label: "Vague attribution",            color: "#7C3AED" },
+  conclusions:  { label: "Outline-like conclusion",      color: "#2563EB" },
+  leads:        { label: "Title-as-proper-noun lead",    color: "#16A34A" },
+  isare:        { label: "Avoiding plain 'is/are'",      color: "#EA580C" },
+  parallelism:  { label: "Negative parallelism",         color: "#4F46E5" },
+  emdash:       { label: "Em-dash overuse",              color: "#65A30D" },
+};
+const FALLBACK_COLOR = "#888888";
+
+const SAMPLE = `Springfield serves as a vibrant cultural hub, showcasing a rich tapestry of history that marks a pivotal moment in the region's development. The Springfield Music Festival is an annual event that has been featured in numerous publications, including Rolling Stone, Billboard, and Variety, reflecting its broader cultural significance. Experts argue that the festival not only boosts tourism but also fosters community engagement — highlighting its commitment to local heritage. It is widely interpreted as a testament to the area's enduring creative spirit. Despite these challenges, the festival faces several challenges as it looks toward the future. Catchment area refers to the geographic region from which the festival draws the majority of its attendees.`;
 
 // ── BACKEND URL — update to your deployed Deno endpoint ──
 const API_URL = "https://irfeedback0609.deno.dev/";
+
+function catColor(type)  { return (CATS[type] && CATS[type].color) || FALLBACK_COLOR; }
+function catLabel(type)  { return (CATS[type] && CATS[type].label) || type; }
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function highlightPhrase(sentenceText, phrase, hlClass) {
+function highlightPhrase(sentenceText, phrase, color) {
+  if (!phrase) return sentenceText;
   const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const re = new RegExp(`(${escaped})`, 'gi');
   if (re.test(sentenceText)) {
-    return sentenceText.replace(re, `<span class="${hlClass}">$1</span>`);
+    const style = `background:${color}26;border-bottom:2px solid ${color};`;
+    return sentenceText.replace(re, `<span class="hl" style="${style}">$1</span>`);
   }
   return sentenceText;
+}
+
+function buildLegend() {
+  const legend = document.getElementById('legendBar');
+  let html = '<span class="legend-title">LEGEND</span>';
+  for (const key in CATS) {
+    html += `<span class="legend-item"><span class="legend-dot" style="background:${CATS[key].color}"></span> ${escHtml(CATS[key].label)}</span>`;
+  }
+  legend.innerHTML = html;
 }
 
 function renderResults(data) {
@@ -392,41 +380,27 @@ function renderResults(data) {
   const totalsRow = document.getElementById('totalsRow');
   const summaryProse = document.getElementById('summaryProse');
 
-  const typeToClass = {
-    declarative: 'declarative',
-    analogous: 'analogous',
-    topic: 'topic',
-    concluding: 'concluding',
-    listing: 'listing',
-  };
-
-  const typeToLabel = {
-    declarative: 'Weak declarative',
-    analogous: 'Analogous argument',
-    topic: 'Topic sentence',
-    concluding: 'Concluding sentence',
-    listing: 'Listing',
-  };
-
   let breakdownHtml = '';
-  for (const s of data.sentences) {
+  for (const s of (data.sentences || [])) {
+    const flags = s.flags || [];
     let textHtml = escHtml(s.text);
-    const sortedFlags = [...s.flags].sort((a, b) => b.phrase.length - a.phrase.length);
+    // Longest phrases first so nested replacements don't collide.
+    const sortedFlags = [...flags].sort((a, b) => (b.phrase || '').length - (a.phrase || '').length);
     for (const f of sortedFlags) {
-      const cls = 'hl-' + (typeToClass[f.type] || f.type);
-      textHtml = highlightPhrase(textHtml, f.phrase, cls);
+      textHtml = highlightPhrase(textHtml, f.phrase, catColor(f.type));
     }
 
     let tagsHtml = '';
-    if (s.flags.length > 0) {
-      tagsHtml = '<div class="tag-row">' + s.flags.map(f => {
-        const tagCls = 'tag-' + (typeToClass[f.type] || f.type);
-        const label = typeToLabel[f.type] || f.type;
-        let tagText = label;
+    if (flags.length > 0) {
+      tagsHtml = '<div class="tag-row">' + flags.map(f => {
+        const color = catColor(f.type);
+        let tagText = catLabel(f.type);
         if (f.phrase) tagText += ` \u2014 \u201c${escHtml(f.phrase)}\u201d`;
         if (f.explanation) tagText += ` ${escHtml(f.explanation)}`;
-        return `<span class="tag ${tagCls}">${tagText}</span>`;
+        return `<span class="tag" style="background:${color}1a;color:${color};">${tagText}</span>`;
       }).join('') + '</div>';
+    } else {
+      tagsHtml = '<div class="clean-note">No AI tendencies flagged in this sentence.</div>';
     }
 
     breakdownHtml += `
@@ -440,15 +414,19 @@ function renderResults(data) {
   }
   breakdown.innerHTML = breakdownHtml;
 
-  const t = data.totals;
-  totalsRow.innerHTML = `
-    <div class="total-card tc-declarative"><div class="num">${t.declarative}</div><div class="label">Weak declarative</div></div>
-    <div class="total-card tc-analogous"><div class="num">${t.analogous}</div><div class="label">Analogous arguments</div></div>
-    <div class="total-card tc-topic"><div class="num">${t.topic}</div><div class="label">Topic sentence issues</div></div>
-    <div class="total-card tc-concluding"><div class="num">${t.concluding}</div><div class="label">Concluding mismatch</div></div>
-    <div class="total-card tc-listing"><div class="num">${t.listing}</div><div class="label">Listing patterns</div></div>`;
+  const t = data.totals || {};
+  let totalsHtml = '';
+  for (const key in CATS) {
+    const color = CATS[key].color;
+    const n = (typeof t[key] === 'number') ? t[key] : 0;
+    totalsHtml += `<div class="total-card" style="background:${color}12;">
+      <div class="num" style="color:${color};">${n}</div>
+      <div class="label">${escHtml(CATS[key].label)}</div>
+    </div>`;
+  }
+  totalsRow.innerHTML = totalsHtml;
 
-  let summaryHtml = escHtml(data.summary)
+  let summaryHtml = escHtml(data.summary || '')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br>');
@@ -508,6 +486,8 @@ document.getElementById('input').addEventListener('keydown', (e) => {
     document.getElementById('analyzeBtn').click();
   }
 });
+
+buildLegend();
 </script>
 </body>
 </html>
