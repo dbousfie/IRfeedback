@@ -1,0 +1,41 @@
+Cloudflare Worker Env Vars — Annoying AI Tendencies Detector
+============================================================
+
+Where: dash.cloudflare.com → your worker → Settings → Variables and Secrets
+Tip:   Click "Edit" (next to "+ Add") to set multiple at once.
+
+REQUIRED
+----------------------  --------  --------------------------------------------
+Name                    Type      Notes
+CRITERIA_URL            Text      Raw GitHub URL of this repo's criteria.md, e.g.
+                                  https://raw.githubusercontent.com/dbousfie/<REPO>/main/criteria.md
+
+PICK ONE PROVIDER (you do NOT need both)
+----------------------  --------  --------------------------------------------
+  Option A — OpenAI (matches the template):
+OPENAI_API_KEY          Secret    sk-...
+OPENAI_MODEL            Text      optional, defaults to gpt-4o-mini
+
+  Option B — Azure (your current setup; deploy with just the key):
+AZURE_OPENAI_KEY        Secret    your Azure key
+AZURE_ENDPOINT          Text      optional, defaults to https://chatbot-api-western.openai.azure.com
+AZURE_DEPLOYMENT_NAME   Text      optional, defaults to gpt-4.1-mini
+AZURE_API_VERSION       Text      optional, defaults to 2024-04-01-preview
+
+OPTIONAL — Qualtrics logging
+----------------------  --------  --------------------------------------------
+QUALTRICS_API_TOKEN     Secret    from Qualtrics → Account Settings → API
+QUALTRICS_SURVEY_ID     Text      SV_... (from the survey URL)
+QUALTRICS_DATACENTER    Text      e.g. uwo.eu
+MAX_TOKENS              Text      optional, defaults to 2000
+
+Qualtrics survey embedded data fields needed: queryText, responseText
+(add "feedback" too if you later wire up thumbs-up/down buttons)
+
+Per-bot values to update:
+  - CRITERIA_URL: change <REPO> to this bot's repo name
+  - the API key (per-bot key if tracking costs separately)
+
+Reminder for index.html:
+  Update WORKER_URL near the top of the <script> to:
+  https://<this-worker-name>.<your-subdomain>.workers.dev/

@@ -275,6 +275,34 @@
       font-style: italic;
       margin-top: 12px;
     }
+
+    .feedback-box {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 14px;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .feedback-box .fb-prompt { font-weight: 700; }
+
+    .feedback-box button {
+      background: #fff;
+      color: #444;
+      border: 1px solid #999;
+      padding: 5px 12px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .feedback-box button:hover { background: #eee; }
+
+    .feedback-box .fb-thanks { font-style: italic; color: #5B8C5A; }
   </style>
 </head>
 <body>
@@ -319,6 +347,8 @@
       <div class="totals-row" id="totalsRow"></div>
 
       <div class="summary-prose" id="summaryProse"></div>
+
+      <div class="feedback-box" id="feedbackBox" style="display:none"></div>
     </div>
   </div>
 
@@ -345,8 +375,8 @@ const FALLBACK_COLOR = "#888888";
 
 const SAMPLE = `Springfield serves as a vibrant cultural hub, showcasing a rich tapestry of history that marks a pivotal moment in the region's development. The Springfield Music Festival is an annual event that has been featured in numerous publications, including Rolling Stone, Billboard, and Variety, reflecting its broader cultural significance. Experts argue that the festival not only boosts tourism but also fosters community engagement — highlighting its commitment to local heritage. It is widely interpreted as a testament to the area's enduring creative spirit. Despite these challenges, the festival faces several challenges as it looks toward the future. Catchment area refers to the geographic region from which the festival draws the majority of its attendees.`;
 
-// ── BACKEND URL — update to your deployed Deno endpoint ──
-const API_URL = "https://irfeedback0609.deno.dev/";
+// ── BACKEND URL — your deployed Cloudflare Worker endpoint ──
+const WORKER_URL = "https://<your-worker-name>.<your-subdomain>.workers.dev/";
 
 function catColor(type)  { return (CATS[type] && CATS[type].color) || FALLBACK_COLOR; }
 function catLabel(type)  { return (CATS[type] && CATS[type].label) || type; }
@@ -435,17 +465,27 @@ function renderResults(data) {
   document.getElementById('results').style.display = 'block';
 }
 
+// ── Feedback state (declared before use) ────────────────────────
+let lastQuery = "";
+let lastResponse = "";
+
 async function analyzeParagraph(text) {
   const loadingArea = document.getElementById('loadingArea');
   const errorMsg = document.getElementById('errorMsg');
   const resultsDiv = document.getElementById('results');
+  const feedbackBox = document.getElementById('feedbackBox');
 
   resultsDiv.style.display = 'none';
   errorMsg.style.display = 'none';
+  feedbackBox.style.display = 'none';
+  feedbackBox.innerHTML = '';
   loadingArea.style.display = 'block';
 
+  lastQuery = text;
+  lastResponse = '';
+
   try {
-    const res = await fetch(API_URL, {
+    const res = await fetch(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: text })
@@ -456,12 +496,48 @@ async function analyzeParagraph(text) {
     const data = JSON.parse(cleaned);
 
     if (data.error) throw new Error(data.error);
+    lastResponse = cleaned;
     renderResults(data);
+    showFeedbackButtons();
   } catch (err) {
     errorMsg.textContent = 'Error: ' + err.message;
     errorMsg.style.display = 'block';
   } finally {
     loadingArea.style.display = 'none';
+  }
+}
+
+// ── Feedback (thumbs up/down) ───────────────────────────────────
+// Logs to the worker's feedback path, which records to Qualtrics
+// without calling the model (so clicks are free).
+function showFeedbackButtons() {
+  const fb = document.getElementById('feedbackBox');
+  fb.innerHTML =
+    '<span class="fb-prompt">Was this analysis helpful?</span>' +
+    '<button data-feedback="helpful">\uD83D\uDC4D Yes</button>' +
+    '<button data-feedback="not_helpful">\uD83D\uDC4E No</button>';
+  fb.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => sendFeedback(b.dataset.feedback));
+  });
+  fb.style.display = 'flex';
+}
+
+async function sendFeedback(value) {
+  const fb = document.getElementById('feedbackBox');
+  fb.innerHTML = '<span class="fb-thanks">Sending...</span>';
+  try {
+    await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: lastQuery,
+        responseText: lastResponse,
+        feedback: value,
+      })
+    });
+    fb.innerHTML = '<span class="fb-thanks">Thanks for your feedback!</span>';
+  } catch {
+    fb.innerHTML = '<span class="fb-thanks">Could not send feedback.</span>';
   }
 }
 
@@ -475,6 +551,7 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   document.getElementById('input').value = '';
   document.getElementById('results').style.display = 'none';
   document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('feedbackBox').style.display = 'none';
 });
 
 document.getElementById('loadSample').addEventListener('click', () => {
